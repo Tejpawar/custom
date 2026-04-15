@@ -24,19 +24,11 @@
 
     render() {
       return super.render(`
-        <div style="display:flex; gap:10px; align-items:center;">
-          
+        <div style="display:flex; gap:10px;">
           <input type="text" ref="name" class="form-control" placeholder="Product Name"/>
-          
           <input type="number" ref="price" class="form-control" placeholder="Price"/>
-          
           <input type="number" ref="qty" class="form-control" placeholder="Qty"/>
-          
-          <div>
-            <strong>Total: </strong>
-            <span ref="total">0</span>
-          </div>
-
+          <div><strong>Total: </strong><span ref="total">0</span></div>
         </div>
       `);
     }
@@ -50,19 +42,21 @@
       });
 
       const calculate = () => {
-        const name = this.refs.name.value || '';
-        const price = parseFloat(this.refs.price.value) || 0;
-        const qty = parseFloat(this.refs.qty.value) || 0;
-        const total = price * qty;
+        const value = {
+          name: this.refs.name.value || '',
+          price: parseFloat(this.refs.price.value) || 0,
+          quantity: parseFloat(this.refs.qty.value) || 0,
+        };
 
-        this.refs.total.innerHTML = total;
+        value.total = value.price * value.quantity;
 
-        this.updateValue({
-          name,
-          price,
-          quantity: qty,
-          total
-        });
+        if (this.refs.total) {
+          this.refs.total.innerHTML = value.total;
+        }
+
+        // 🔥 IMPORTANT FIX
+        this.dataValue = value;
+        this.triggerChange();
       };
 
       this.addEventListener(this.refs.name, 'input', calculate);
@@ -73,7 +67,7 @@
     }
 
     getValue() {
-      return this.dataValue || {};
+      return this.dataValue;
     }
 
     setValue(value) {
@@ -83,6 +77,8 @@
       if (this.refs.price) this.refs.price.value = value.price || 0;
       if (this.refs.qty) this.refs.qty.value = value.quantity || 0;
       if (this.refs.total) this.refs.total.innerHTML = value.total || 0;
+
+      this.dataValue = value;
     }
   }
 
